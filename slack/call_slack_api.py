@@ -1,30 +1,55 @@
 import os
 import logging
-import requests
-import json
 
 from dotenv import load_dotenv
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-load_dotenv()
-slack_token = os.environ['SLACK_API_TOKEN']
-channel_id = os.environ['SLACK_CHANNEL_ID']
-webhook_url = os.environ['SLACK_WEBHOOK_URL']
-client = WebClient(token=slack_token)
+def main(send_text):
+    load_dotenv()
+    slack_token = os.environ['SLACK_API_TOKEN']
+    slack_channel_id = os.environ['SLACK_CHANNEL_ID']
+    slack_thread_url = os.environ['SLACK_THREAD_URL']
+    slack_thread_id = ""
+    client = WebClient(token=slack_token)
 
-# Slack Botでメッセージを送信する
-# requests.post(webhook_url, data=json.dumps({
-#     "text" : "Hello World",
-# }))
+    parts = slack_thread_url.split("/p")
+    slack_thread_id_with_dot = parts[-1]
+    thread_ts = f"{slack_thread_id_with_dot[:10]}.{slack_thread_id_with_dot[10:]}"
 
-# Slack APIのWebClientでメッセージを送信する
-try:
-    response = client.chat_postMessage(
-        channel=channel_id, 
-        text="Hello world"
-    )
-    logging.info(response)
+    # Slackのスレッド内のメッセージを取得
+    try:
+        response_conversations = client.conversations_replies(
+            channel=slack_channel_id,
+            ts=thread_ts
+        )
+        print(response_conversations["messages"])
+        message_list = [msg['text'] for msg in response_conversations["messages"] if 'text' in msg]
+        formatted_messages = "\n".join(message_list)
 
-except SlackApiError as e:
-    logging.error(f"Error posting message: {e}")
+        # フォーマットを出力
+        output_format = f"""
+スレッドのメッセージリスト:
+
+{formatted_messages}
+
+SLACK_slack_thread_id={thread_ts}
+https://shuhei-fujita.slack.com/archives/C05JMARDS8P/p{slack_thread_id}
+        """
+
+    except SlackApiError as e:
+        logging.error(f"Error retrieving thread messages: {e}")
+
+    # Slack APIのWebClientでメッセージを送信する
+    try:
+        response = client.chat_postMessage(
+            channel=slack_channel_id, 
+            text=output_format
+        )
+        logging.info(response)
+
+    except SlackApiError as e:
+        logging.error(f"Error posting message: {e}")
+
+if __name__ == "__main__":
+    main("Hello World")
