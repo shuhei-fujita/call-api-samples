@@ -5,14 +5,26 @@ from dotenv import load_dotenv
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-def main(send_text):
-    load_dotenv()
-    slack_token = os.environ['SLACK_API_TOKEN']
-    slack_channel_id = os.environ['SLACK_CHANNEL_ID']
-    slack_thread_url = os.environ['SLACK_THREAD_URL']
-    slack_thread_id = ""
-    client = WebClient(token=slack_token)
+load_dotenv()
+slack_token = os.environ['SLACK_API_TOKEN']
+slack_channel_id = os.environ['SLACK_CHANNEL_ID']
+slack_thread_url = os.environ['SLACK_THREAD_URL']
+slack_thread_id = ""
+client = WebClient(token=slack_token)
 
+def send_messages(send_text):
+    # Slack APIのWebClientでメッセージを送信する
+    try:
+        response = client.chat_postMessage(
+            channel=slack_channel_id, 
+            text=send_text
+        )
+        logging.info(response)
+
+    except SlackApiError as e:
+        logging.error(f"Error posting message: {e}")
+
+def get_messages_in_thread():
     parts = slack_thread_url.split("/p")
     slack_thread_id_with_dot = parts[-1]
     thread_ts = f"{slack_thread_id_with_dot[:10]}.{slack_thread_id_with_dot[10:]}"
@@ -41,15 +53,8 @@ https://shuhei-fujita.slack.com/archives/C05JMARDS8P/p{slack_thread_id}
         logging.error(f"Error retrieving thread messages: {e}")
 
     # Slack APIのWebClientでメッセージを送信する
-    try:
-        response = client.chat_postMessage(
-            channel=slack_channel_id, 
-            text=output_format
-        )
-        logging.info(response)
-
-    except SlackApiError as e:
-        logging.error(f"Error posting message: {e}")
+    send_messages(output_format)
 
 if __name__ == "__main__":
-    main("Hello World")
+    get_messages_in_thread()
+    # send_messages('sample')

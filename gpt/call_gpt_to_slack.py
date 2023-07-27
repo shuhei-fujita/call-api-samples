@@ -19,4 +19,4 @@ data = json.loads(response)
 content = data['content']
 formatted_content = content.replace("\\n", "\n")
 
-call_slack_api.main(formatted_content)
+call_slack_api.send_messages(formatted_content)
