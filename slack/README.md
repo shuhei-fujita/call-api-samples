@@ -1,3 +1,5 @@
+# Slack
+
 ```.env
 SLACK_API_TOKEN=
 SLACK_CHANNEL_ID=

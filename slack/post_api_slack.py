@@ -52,9 +52,6 @@ https://shuhei-fujita.slack.com/archives/C05JMARDS8P/p{slack_thread_id}
     except SlackApiError as e:
         logging.error(f"Error retrieving thread messages: {e}")
 
-    # Slack APIのWebClientでメッセージを送信する
-    send_messages(output_format)
-
 if __name__ == "__main__":
     get_messages_in_thread()
     # send_messages('sample')
