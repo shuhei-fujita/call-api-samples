@@ -19,7 +19,6 @@ def send_messages(send_text):
             channel=slack_channel_id, 
             text=send_text
         )
-        logging.info(response)
 
     except SlackApiError as e:
         logging.error(f"Error posting message: {e}")
@@ -35,7 +34,6 @@ def get_messages_in_thread():
             channel=slack_channel_id,
             ts=thread_ts
         )
-        print(response_conversations["messages"])
         message_list = [msg['text'] for msg in response_conversations["messages"] if 'text' in msg]
         formatted_messages = "\n".join(message_list)
 

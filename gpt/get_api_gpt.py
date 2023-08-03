@@ -7,19 +7,18 @@ import json
 import logging
 import time
 
+def formatt_responses(responses):
+    a = []
+    return a
+
 def main(prompt_file_name):
     # ---設定ファイルの初期化---
-    path_current = os.path.dirname(os.path.realpath(__file__))
-
-    path_env = os.path.join(path_current, '.env')
-    path_prompt = os.path.join(path_current, prompt_file_name)
-
-    load_dotenv(path_env)
+    load_dotenv()
     openai.api_key = os.getenv('OPENAI_API_KEY')
     engine_3 = os.getenv('ENGINE_GPT_3')
     engine_4 = os.getenv('ENGINE_GPT_4')
 
-    with open(path_prompt, 'r') as file:
+    with open(prompt_file_name, 'r') as file:
         prompt = file.read()
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
